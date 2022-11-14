@@ -1,0 +1,10 @@
+{
+  "name": "doubanlist_sub",
+  "title": "豆瓣电影片单订阅",
+  "author": "WWWW",
+  "description": "输入豆瓣片单id号即订阅影片！",
+  "version": "0.1",
+  "requirements": [],
+  "configField": [],
+  "logoUrl": "/plugins/doubanlist_sub/doubanlogo.png"
+}
