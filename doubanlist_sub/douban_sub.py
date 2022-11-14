@@ -7,15 +7,21 @@ import time
 import logging
 import math
 from mbot.core.params import ArgSchema, ArgType
-from mbot.core.plugins import plugin, PluginCommandContext, PluginCommandResponse
+from mbot.core.plugins import plugin, PluginCommandContext, PluginCommandResponse, PluginMeta
 from mbot.openapi import mbot_api
 
 server = mbot_api
 _LOGGER = logging.getLogger(__name__)
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3",
-    "Cookie": 'talionnav_show_app="0"; douban-fav-remind=1; gr_user_id=f9a0ef84-8dc3-4b4b-a7bc-a1352aac6f1a; ll="108288"; __gads=ID=75657e16628bbb3b-22d359e1fad000c2:T=1647326733:RT=1647326733:S=ALNI_MZI5klIMOEvILRHPHChCje4RFbHzw; __gpi=UID=000006cbd06f5ada:T=1655703179:RT=1663662807:S=ALNI_MZEguntr-jBZvVtCOK6XK8tdHTMhw; __utma=30149280.1601438195.1598874039.1660627136.1663662808.20; __utmc=30149280;  dbcl2="206223078:WsuK9BYuAhY"; ck=sd8t; frodotk="ebd2ab03388fdde0c3780109a9af99a0"; push_noty_num=0; push_doumail_num=0; bid=iw51NQrzuXY; vtd-d="1"; ct=y; talionusr="eyJpZCI6ICIyMDYyMjMwNzgiLCAibmFtZSI6ICJXV1dXV1dXVyJ9"; Hm_lvt_6d4a8cfea88fa457c3127e14fb5fabc2=1668255382; Hm_lpvt_6d4a8cfea88fa457c3127e14fb5fabc2=1668255382'
+    "User-Agent": "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3"
 }
+
+
+@plugin.after_setup
+def after_setup(plugin: PluginMeta, plugin_conf: dict):
+    HEADERS.update({
+        'Cookie': server.config.douban.cookie
+    })
 
 
 def parse_douban_id(douban_id):
