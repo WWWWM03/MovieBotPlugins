@@ -1,36 +1,38 @@
 ##分条
 
 
-# --------------------------------------------------
-from moviebotapi import MovieBotServer
-from moviebotapi.core.session import AccessKeySession
-from moviebotapi.subscribe import SubStatus
-SERVER_URL = 'http://192.168.50.190:1329'
-ACCESS_KEY = '123524'
-server = MovieBotServer(AccessKeySession(SERVER_URL, ACCESS_KEY))
+# # --------------------------------------------------
+# from moviebotapi import MovieBotServer
+# from moviebotapi.core.session import AccessKeySession
+# from moviebotapi.subscribe import SubStatus
+# SERVER_URL = 'http://192.168.50.190:1329'
+# ACCESS_KEY = '123524'
+# server = MovieBotServer(AccessKeySession(SERVER_URL, ACCESS_KEY))
 # --------------------------------------------------
 
 #-------------------------------------------------
-# import time
-# from mbot.openapi import mbot_api
-# from mbot.core.plugins import PluginContext, PluginMeta
-# from mbot.core.params import ArgSchema, ArgType
-# from mbot.core.plugins import plugin, PluginCommandContext, PluginCommandResponse, PluginMeta
-# from mbot.core.event.models import EventType
-# from moviebotapi.subscribe import SubStatus
-# from moviebotapi import MovieBotServer
-#
-# server = mbot_api
-#
-# @plugin.command(name='tgbot1', title='tgbot1', desc='tgbot1', icon='HourglassFull', run_in_background=True)
-# def echo(ctx: PluginCommandContext):
-#     main()
-#     return PluginCommandResponse(True, f'跑完了')
+
 
 #-------------------------------------------------
 #!/usr/bin/env python
 # pylint: disable=unused-argument, wrong-import-position
 # This program is dedicated to the public domain under the CC0 license.
+
+import time
+from mbot.openapi import mbot_api
+from mbot.core.plugins import PluginContext, PluginMeta
+from mbot.core.params import ArgSchema, ArgType
+from mbot.core.plugins import plugin, PluginCommandContext, PluginCommandResponse, PluginMeta
+from mbot.core.event.models import EventType
+from moviebotapi.subscribe import SubStatus
+from moviebotapi import MovieBotServer
+
+server = mbot_api
+
+@plugin.command(name='tgbot1', title='tgbot1', desc='tgbot1', icon='HourglassFull', run_in_background=True)
+def echo(ctx: PluginCommandContext):
+    main()
+    return PluginCommandResponse(True, f'跑完了')
 
 
 from telegram.constants import MessageAttachmentType, ParseMode
@@ -177,5 +179,3 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(button))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo1))
     application.run_polling()
-
-main()
