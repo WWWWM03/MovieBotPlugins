@@ -5,8 +5,8 @@
 from moviebotapi import MovieBotServer
 from moviebotapi.core.session import AccessKeySession
 from moviebotapi.subscribe import SubStatus
-SERVER_URL = ''
-ACCESS_KEY = ''
+SERVER_URL = 'http://192.168.50.190:1329'
+ACCESS_KEY = '123524'
 server = MovieBotServer(AccessKeySession(SERVER_URL, ACCESS_KEY))
 # --------------------------------------------------
 
@@ -85,7 +85,9 @@ async def echo1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     mr_caption = []
     mr_idlist = []
     mr_poster_path = []
-    for i in mr_result[:8]:
+    if len(mr_result) > 8:
+        mr_result = mr_result[0:8]
+    for i in mr_result:
         cn_name = i.cn_name
         rating = i.rating
         if rating != rating:
@@ -102,7 +104,7 @@ async def echo1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         mr_poster_path.append(poster_path)
         x+=1
     mr_caption_final = ''.join(str(i) for i in mr_caption)
-
+    mr_caption_final = mr_caption_final + '\n\n请点击下面的按钮'
     mr_keybord = []
     mr_count = []
 
@@ -112,26 +114,33 @@ async def echo1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         mr_keybord.append(str(i))
         y+=1
     mr_keybord_final = []
-    for x, y in zip(mr_count,mr_keybord):
-        aaa = InlineKeyboardButton(x, callback_data=y)
+    count1 = 1
+    for  y in (mr_keybord):
+        aaa = InlineKeyboardButton(count1, callback_data=y)
         mr_keybord_final.append(aaa)
+        count1+=1
+
+    step = 4
+    a = mr_keybord_final
+    b = [a[i:i + step] for i in range(0, len(a), step)]
 
 
-    keyboard = [mr_keybord_final]
+
+    keyboard = b
     reply_markup1 = InlineKeyboardMarkup(keyboard)
     _LOGGER.info(f"返回搜索结果：{mr_caption_final}")
 
-    mr_poster_path_final = []
-    count = 0
-    for i in mr_poster_path:
-        if count == 0:
-            aaa = InputMediaPhoto(media=i,caption=mr_caption_final,parse_mode=ParseMode.MARKDOWN)
-            mr_poster_path_final.append(aaa)
-            count += 1
-        else:
-            aaa = InputMediaPhoto(media=i)
-            mr_poster_path_final.append(aaa)
-            count += 1
+    # mr_poster_path_final = []
+    # count = 0
+    # for i in mr_poster_path:
+    #     if count == -1:
+    #         aaa = InputMediaPhoto(media=i,caption=mr_caption_final,parse_mode=ParseMode.MARKDOWN)
+    #         mr_poster_path_final.append(aaa)
+    #         count += 1
+    #     else:
+    #         aaa = InputMediaPhoto(media=i)
+    #         mr_poster_path_final.append(aaa)
+    #         count += 1
 ###media_group
     # await update.message.reply_media_group(media=mr_poster_path_final)
 
@@ -152,7 +161,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 def main() -> None:
     """Run the bot."""
-    application = Application.builder().token("").build()
+    application = Application.builder().token("5627383083:AAE7A7JfW8fQrKvsg1OtxmWXIFNqnxEizJU").build()
     application.add_handler(CallbackQueryHandler(button))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo1))
     application.run_polling()
