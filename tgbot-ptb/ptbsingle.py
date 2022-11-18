@@ -75,18 +75,31 @@ _LOGGER = logging.getLogger(__name__)
 
 
 
+chatid_list=[
+            '5414216757',
+            '1663257876'
+]
+
+
 
 
 async def echo1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     mr_result = server.douban.search(update.message.text)
-    await update.message.reply_text(f"正在搜索 {update.message.text} 中.....")
+    chat_id = str(update.message.chat_id)
+    if chat_id not in chatid_list:
+        await update.message.reply_text(f"未经授权！")
+        _LOGGER.info(f"chat_id：{chat_id} , 未经授权")
+        return
+    else:
+        await update.message.reply_text(f"正在搜索 {update.message.text} 中.....")
+        _LOGGER.info(f"chat_id：{chat_id} , 正在搜索 ")
     x = 0
     mr_caption = []
     mr_idlist = []
     mr_poster_path = []
-    if len(mr_result) > 8:
-        mr_result = mr_result[0:8]
+    # if len(mr_result) > 8:
+    #     mr_result = mr_result[0:8]
     for i in mr_result:
         cn_name = i.cn_name
         rating = i.rating
@@ -120,31 +133,12 @@ async def echo1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         mr_keybord_final.append(aaa)
         count1+=1
 
-    step = 4
+    step = 8
     a = mr_keybord_final
     b = [a[i:i + step] for i in range(0, len(a), step)]
-
-
-
     keyboard = b
     reply_markup1 = InlineKeyboardMarkup(keyboard)
     _LOGGER.info(f"返回搜索结果：{mr_caption_final}")
-
-    # mr_poster_path_final = []
-    # count = 0
-    # for i in mr_poster_path:
-    #     if count == -1:
-    #         aaa = InputMediaPhoto(media=i,caption=mr_caption_final,parse_mode=ParseMode.MARKDOWN)
-    #         mr_poster_path_final.append(aaa)
-    #         count += 1
-    #     else:
-    #         aaa = InputMediaPhoto(media=i)
-    #         mr_poster_path_final.append(aaa)
-    #         count += 1
-###media_group
-    # await update.message.reply_media_group(media=mr_poster_path_final)
-
-###photo
     await update.message.reply_photo(reply_markup=reply_markup1, photo=mr_poster_path[0],
                                      caption=f"{mr_caption_final} ",
                                      parse_mode=ParseMode.MARKDOWN)
@@ -158,10 +152,28 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     _LOGGER.info(f"{x[1]} 已提交订阅")
     await query.message.reply_text(f"{x[1]} 已提交订阅")
 
+async def rebootmr(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Send a message when the command /start is issued."""
+
+    server.common.restart_app(3)
+    await update.message.reply_text(f"3秒后将重启Movie-Bot....")
+    _LOGGER.info(f"3秒后将重启Movie-Bot....")
+
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Send a message when the command /help is issued."""
+    await update.message.reply_text(f"1. 请直接输入您想查询的关键词\n"
+                                    f"2. 重启Movie-Bot机器人  ------  /rebootmr\n"
+                                    f"3. 重启Movie-Bot机器人  ------  /rebootmr\n"
+                                    f"4. 重启Movie-Bot机器人  ------  /rebootmr\n"
+                                    f"5. 重启Movie-Bot机器人  ------  /rebootmr\n"
+                                    f"6. 重启Movie-Bot机器人  ------  /rebootmr\n")
+
 
 def main() -> None:
     """Run the bot."""
     application = Application.builder().token("5627383083:AAE7A7JfW8fQrKvsg1OtxmWXIFNqnxEizJU").build()
+    application.add_handler(CommandHandler("rebootmr", rebootmr))
+    application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CallbackQueryHandler(button))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo1))
     application.run_polling()
