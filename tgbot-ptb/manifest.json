@@ -1,0 +1,18 @@
+{
+  "name": "tgbot_sub",
+  "title": "telegrambot订阅",
+  "author": "WWWW",
+  "description": "telegrambot订阅！",
+  "version": "0.1",
+  "requirements": [],
+  "configField": [
+    {
+      "fieldName": "TGbotTOKEN",
+      "fieldType": "String",
+      "label": "TGbotTOKEN",
+      "helperText": "TGbotTOKEN，输入bot后面的内容，如：56273XXXXX:XXXXXXXvsg1OtxmWXIFNqnxEizJU",
+      "defaultValue": ""
+    }
+  ],
+  "logoUrl": "/plugins/doubanlist_sub/doubanlogo.png"
+}
