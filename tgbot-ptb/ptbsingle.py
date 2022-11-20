@@ -105,7 +105,7 @@ class TgBotSub:
             mr_idlist.append(f'{id}-{num}')
             # _LOGGER.info(f'{id}-{num}')
             num += 1
-        mr_caption_final = ''.join(str(i) for i in mr_caption) + '\n\n📥未订阅 | ✔已完成' + '\n\n🛎️订阅中 | 🔁洗版中' + '\n\n️️️️请点对应的序号️️️️'
+        mr_caption_final = ''.join(str(i) for i in mr_caption) + '\n\n📥未订阅 | ✔已完成' + '\n\n🛎️订阅中 | 🔁洗版中' + '\n\n⬇⬇⬇请点对应的序号⬇⬇⬇'
 
         mr_keybord = []
         mr_count = []
@@ -123,7 +123,7 @@ class TgBotSub:
         step = 5
         a = mr_keybord_final
         b = [a[i:i + step] for i in range(0, len(a), step)]
-        b.append([InlineKeyboardButton('关闭', callback_data=f'delete-1-')])
+        b.append([InlineKeyboardButton('🔚关闭', callback_data=f'delete-1-')])
         keyboard = b
         reply_markup1 = InlineKeyboardMarkup(keyboard)
         # _LOGGER.info(f"{media_name} 返回搜索结果：\n{mr_caption_final}")
@@ -176,11 +176,11 @@ class TgBotSub:
         # _LOGGER.info(f"{self.caption_button} ")
         keyboard = [
             [
-                InlineKeyboardButton('订阅', callback_data=f'sub-{doubanid}-'),
-                InlineKeyboardButton('返回', callback_data=f'back-{doubanid}-'),
+                InlineKeyboardButton('🛎️订阅', callback_data=f'sub-{doubanid}-'),
+                InlineKeyboardButton('🔙返回', callback_data=f'back-{doubanid}-'),
             ],
             [
-                InlineKeyboardButton('关闭', callback_data=f'delete-{doubanid}-')
+                InlineKeyboardButton('🔚关闭', callback_data=f'delete-{doubanid}-')
             ]
         ]
         self.reply_markup_button = InlineKeyboardMarkup(keyboard)
@@ -189,10 +189,10 @@ class TgBotSub:
 
         keyboard1 = [
             [
-                InlineKeyboardButton('返回', callback_data=f'back-{doubanid}-'),
+                InlineKeyboardButton('🔙返回', callback_data=f'back-{doubanid}-'),
             ],
             [
-                InlineKeyboardButton('关闭', callback_data=f'delete-{doubanid}-')
+                InlineKeyboardButton('🔚关闭', callback_data=f'delete-{doubanid}-')
             ]
         ]
         self.reply_markup_doubansub = InlineKeyboardMarkup(keyboard1)
