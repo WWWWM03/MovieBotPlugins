@@ -1,12 +1,3 @@
-# --------------------------------------------------
-from moviebotapi import MovieBotServer
-from moviebotapi.core.session import AccessKeySession
-from moviebotapi.subscribe import SubStatus
-SERVER_URL = 'http://192.168.50.190:1329'
-ACCESS_KEY = '123524'
-server = MovieBotServer(AccessKeySession(SERVER_URL, ACCESS_KEY))
-# --------------------------------------------------
-
 # !/usr/bin/env python
 # pylint: disable=unused-argument, wrong-import-position
 # This program is dedicated to the public domain under the CC0 license.
@@ -16,16 +7,16 @@ import asyncio
 import threading
 import time
 
-# from typing import Dict, Any
-# from mbot.openapi import mbot_api
-# from mbot.core.plugins import PluginContext, PluginMeta
-# from mbot.core.params import ArgSchema, ArgType
-# from mbot.core.plugins import PluginContext , plugin, PluginCommandContext, PluginCommandResponse, PluginMeta
-# from mbot.core.event.models import EventType
-# from moviebotapi.subscribe import SubStatus
-# from moviebotapi import MovieBotServer
-#
-# server = mbot_api
+from typing import Dict, Any
+from mbot.openapi import mbot_api
+from mbot.core.plugins import PluginContext, PluginMeta
+from mbot.core.params import ArgSchema, ArgType
+from mbot.core.plugins import PluginContext, plugin, PluginCommandContext, PluginCommandResponse, PluginMeta
+from mbot.core.event.models import EventType
+from moviebotapi.subscribe import SubStatus
+from moviebotapi import MovieBotServer
+
+server = mbot_api
 
 from telegram.constants import MessageAttachmentType, ParseMode
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
@@ -69,13 +60,16 @@ logger = logging.getLogger(__name__)
 _LOGGER = logging.getLogger(__name__)
 
 
-
-
-
 class TgBotSub:
     def __init__(self):
-        self.TGbotTOKEN = '11'
-        self.chatid_list=[]
+        self.TGbotTOKEN = None
+        self.chatid_list = None
+        self.proxy = None
+
+    def set_config(self, TGbotTOKEN: str, chatid_list: list ,proxy: str ):
+        self.TGbotTOKEN = TGbotTOKEN
+        self.chatid_list = chatid_list.split(",")
+        self.proxy = proxy if proxy else None
 
     def douban_search(self, media_name: str):
         douban_result_list = server.douban.search(media_name)
@@ -106,6 +100,7 @@ class TgBotSub:
             mr_caption.append(caption)
             mr_poster_path.append(poster_path)
             mr_idlist.append(f'{id}-{num}')
+            # _LOGGER.info(f'{id}-{num}')
             num += 1
         mr_caption_final = ''.join(str(i) for i in mr_caption) + '\n\n↓↓↓↓请点对应的序号↓↓↓↓'
 
@@ -125,11 +120,12 @@ class TgBotSub:
         step = 7
         a = mr_keybord_final
         b = [a[i:i + step] for i in range(0, len(a), step)]
+        b.append([InlineKeyboardButton('关闭', callback_data=f'delete-1-')])
         keyboard = b
         reply_markup1 = InlineKeyboardMarkup(keyboard)
-        _LOGGER.info(f"{media_name} 返回搜索结果：\n{mr_caption_final}")
+        # _LOGGER.info(f"{media_name} 返回搜索结果：\n{mr_caption_final}")
 
-        return mr_caption_final , mr_poster_path ,reply_markup1
+        return mr_caption_final, mr_poster_path, reply_markup1
 
     def douban_get(self, media_id: str):
         doubandetils = server.douban.get(media_id)
@@ -172,20 +168,24 @@ class TgBotSub:
         if media_type == 'MediaType.Movie':
             self.caption_button = f'{self.num} . *{cn_name}*   {media_type.split(".")[1]}\n上映时间：{premiere_date}  {rating}\n\n简介：{intro}\n{actor}{genres}'
         else:
-            self.caption_caption = f'{self.num} . *{cn_name}*   {media_type.split(".")[1]}\n第{season_index}季，共{episode_count}集\n上映时间：{premiere_date}  {rating}\n\n简介：{intro}\n{actor}{genres}'
+            self.caption_button = f'{self.num} . *{cn_name}*   {media_type.split(".")[1]}\n第{season_index}季，共{episode_count}集\n上映时间：{premiere_date}  {rating}\n\n简介：{intro}\n{actor}{genres}'
 
-        _LOGGER.info(f"{self.caption_button} ")
+        # _LOGGER.info(f"{self.caption_button} ")
         keyboard = [
             [
                 InlineKeyboardButton('订阅', callback_data=f'sub-{doubanid}-'),
                 InlineKeyboardButton('返回', callback_data=f'back-{doubanid}-'),
+            ],
+            [
+                InlineKeyboardButton('关闭', callback_data=f'delete-{doubanid}-')
             ]
         ]
         self.reply_markup_button = InlineKeyboardMarkup(keyboard)
 
-    async def menu_list(self,update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    async def menu_list(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         chat_id = str(update.message.chat_id)
-        if self.chatid_list == []:
+
+        if self.chatid_list[0] == '':
             await update.message.reply_text(
                 f"当前用户chat_id：{chat_id} ，Movie—Bot插件未设置chat_id，所有用户都可以访问！！")
             _LOGGER.info(f"当前用户chat_id：{chat_id} ，Movie—Bot插件未设置chat_id")
@@ -196,7 +196,7 @@ class TgBotSub:
         else:
             await update.message.reply_text(f"正在搜索 {update.message.text} 中.....")
             _LOGGER.info(f"chat_id：{chat_id} , 正在搜索 ")
-        _LOGGER.info(f"menu_list")
+        # _LOGGER.info(f"menu_list")
         self.inputmessage = update.message.text
         result = self.douban_search(update.message.text)
         if result[1] == []:
@@ -204,17 +204,17 @@ class TgBotSub:
             await update.message.reply_text(f"{update.message.text} 搜索结果为空")
             return
         await update.message.reply_photo(
-                                         reply_markup=result[2],
-                                         photo=result[1][0],
-                                         caption=result[0],
-                                         parse_mode=ParseMode.MARKDOWN
-                                         )
+            reply_markup=result[2],
+            photo=result[1][0],
+            caption=result[0],
+            parse_mode=ParseMode.MARKDOWN
+        )
 
-
-    async def button(self,update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    async def button(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         query = update.callback_query
         doubanid = query.data.split('-')[0]
         self.num = query.data.split('-')[1]
+        # _LOGGER.info(f"num : {self.num} ")
         self.douban_get(doubanid)
         await query.edit_message_media(reply_markup=self.reply_markup_button,
                                        media=InputMediaPhoto(
@@ -225,55 +225,64 @@ class TgBotSub:
                                        )
         await query.answer()
 
-
-
-    async def backtomenu(self,update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    async def backtomenu(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         query = update.callback_query
         self.num = query.data.split('-')[2]
         #
         result = self.douban_search(self.inputmessage)
 
         await query.edit_message_media(
-                                         reply_markup=result[2],
-                                         media=InputMediaPhoto(
-                                         media=result[1][0],
-                                         caption=result[0],
-                                         parse_mode=ParseMode.MARKDOWN
-                                           )
-                                         )
+            reply_markup=result[2],
+            media=InputMediaPhoto(
+                media=result[1][0],
+                caption=result[0],
+                parse_mode=ParseMode.MARKDOWN
+            )
+        )
         await query.answer()
 
-
-    async def doubansub(self,update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    async def doubansub(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Parses the CallbackQuery and updates the message text."""
         query = update.callback_query
 
         x = query.data.split('-')
-        _LOGGER.info(f"订阅")
+        # _LOGGER.info(f"订阅")
 
         server.subscribe.sub_by_douban(x[1])
         await query.message.reply_text(f"{self.cn_name} 已提交订阅")
         await query.answer()
 
 
-    def start_bot(self) -> None:
+
+
+    async def deletekeyboard(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Parses the CallbackQuery and updates the message text."""
+        query = update.callback_query
+        #
+        # x = query.data.split('-')
+        # # _LOGGER.info(f"订阅")
+        #
+        # server.subscribe.sub_by_douban(x[1])
+        await query.delete_message()
+
+        await query.answer()
+
+
+    def start_bot(self, config: Dict) -> None:
         loop = asyncio.new_event_loop()
         try:
             asyncio.set_event_loop(loop)
-            application = Application.builder().token(self.TGbotTOKEN).build()
+            application = Application.builder().token(self.TGbotTOKEN).proxy_url(self.proxy).get_updates_proxy_url(self.proxy).build()
             # application.add_handler(CommandHandler("rebootmr", rebootmr))
             # application.add_handler(CommandHandler("help", help_command))
             application.add_handler(CallbackQueryHandler(self.backtomenu, pattern="^back"))
+            application.add_handler(CallbackQueryHandler(self.deletekeyboard, pattern="^delete"))
             application.add_handler(CallbackQueryHandler(self.button, pattern="^\d"))
             application.add_handler(CallbackQueryHandler(self.doubansub, pattern="^sub"))
-            application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Text(['重启Movie-Bot']), self.menu_list))
+            application.add_handler(
+                MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Text(['重启Movie-Bot']), self.menu_list))
             # application.add_handler(MessageHandler(filters.Text(['重启Movie-Bot']), rebootmr))
             application.run_polling(stop_signals=None, close_loop=False)
         finally:
             loop.close()
             pass
-
-
-
-if __name__ == '__main__':
-    TgBotSub().start_bot()
