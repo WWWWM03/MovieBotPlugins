@@ -63,12 +63,12 @@ _LOGGER = logging.getLogger(__name__)
 class TgBotSub:
     def __init__(self):
         self.TGbotTOKEN = None
-        self.chatid_list = None
+        self.chatid_list = []
         self.proxy = None
 
-    def set_config(self, TGbotTOKEN: str, chatid_list: list ,proxy: str ):
+    def set_config(self, TGbotTOKEN: str, chatid_list: str ,proxy: str ):
         self.TGbotTOKEN = TGbotTOKEN
-        self.chatid_list = chatid_list.split(",")
+        self.chatid_list = chatid_list.split(",") if chatid_list.split(",") else None
         self.proxy = proxy if proxy else None
 
     def douban_search(self, media_name: str):
@@ -85,9 +85,9 @@ class TgBotSub:
             url = i.url
             status = i.status
             if rating == 'nan':
-                rating = f''
+                rating = f'⭐️0.0'
             else:
-                rating = f'   ⭐{rating}'
+                rating = f'⭐️{rating}'
             if status == 0:
                 status = '🛎️'
             elif status == 1:
@@ -95,8 +95,9 @@ class TgBotSub:
             elif status == 2:
                 status = '🔁'
             else:
-                status = ' '
-            caption = f'{num} . {status} [{cn_name}]({url}){rating}\n'
+                status = '📥'
+            set_num = "%02d" % num
+            caption = f'`{set_num}`.{status}`[{rating}]`|[{cn_name}]({url})\n'
             mr_caption.append(caption)
             mr_poster_path.append(poster_path)
             mr_idlist.append(f'{id}-{num}')
@@ -144,7 +145,7 @@ class TgBotSub:
         genres = doubandetils.genres
         episode_count = doubandetils.episode_count  # 集
         if rating == '0.0':
-            rating = f''
+            rating = f'⭐0.0'
         else:
             rating = f'⭐{rating}'
 
@@ -166,9 +167,9 @@ class TgBotSub:
             intro = '暂无简介'
 
         if media_type == 'MediaType.Movie':
-            self.caption_button = f'{self.num} . *{cn_name}*   {media_type.split(".")[1]}\n上映时间：{premiere_date}  {rating}\n\n简介：{intro}\n{actor}{genres}'
+            self.caption_button = f'片名：*{cn_name}*{rating}\n类型：{media_type.split(".")[1]}\n上映时间：{premiere_date}\n{actor}{genres}简介：{intro}'
         else:
-            self.caption_button = f'{self.num} . *{cn_name}*   {media_type.split(".")[1]}\n第{season_index}季，共{episode_count}集\n上映时间：{premiere_date}  {rating}\n\n简介：{intro}\n{actor}{genres}'
+            self.caption_button = f'剧名：*{cn_name}*{rating}\n类型：{media_type.split(".")[1]}\n第{season_index}季 共{episode_count}集\n上映时间：{premiere_date}\n{actor}{genres}简介：{intro}'
 
         # _LOGGER.info(f"{self.caption_button} ")
         keyboard = [
@@ -190,12 +191,12 @@ class TgBotSub:
                 f"当前用户chat_id：{chat_id} ，Movie—Bot插件未设置chat_id，所有用户都可以访问！！")
             _LOGGER.info(f"当前用户chat_id：{chat_id} ，Movie—Bot插件未设置chat_id")
         elif chat_id not in self.chatid_list:
-            await update.message.reply_text(f"未经授权！")
+            await update.message.reply_text(f"UserID: {chat_id}\n你未经授权！不可使用此机器人")
             _LOGGER.info(f"chat_id：{chat_id} , 未经授权")
             return
         else:
             await update.message.reply_text(f"正在搜索 {update.message.text} 中.....")
-            _LOGGER.info(f"chat_id：{chat_id} , 正在搜索 ")
+            _LOGGER.info(f"chat_id：{chat_id} , 正在搜索 {update.message.text} 中 ")
         # _LOGGER.info(f"menu_list")
         self.inputmessage = update.message.text
         result = self.douban_search(update.message.text)
