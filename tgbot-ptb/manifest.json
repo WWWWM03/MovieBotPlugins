@@ -1,8 +1,8 @@
 {
-  "name": "tgbot_sub",
-  "title": "telegrambot订阅",
+  "name": "TG_Bot",
+  "title": "TG_Bot消息交互",
   "author": "WWWW",
-  "description": "telegrambot订阅！",
+  "description": "通过TG_Bot交互机器人搜索订阅重启容器等事件",
   "version": "0.1",
   "requirements": [],
   "configField": [
@@ -10,9 +10,23 @@
       "fieldName": "TGbotTOKEN",
       "fieldType": "String",
       "label": "TGbotTOKEN",
-      "helperText": "TGbotTOKEN，输入bot后面的内容，如：56273XXXXX:XXXXXXXvsg1OtxmWXIFNqnxEizJU",
+      "helperText": "从Bot_Father获取TG_Bot的token，输入bot后面的内容，    如： 56273XXXXX:XXXXXXXvsg1OtxmWXIFNqnxEizJU",
+      "defaultValue": ""
+    },
+    {
+      "fieldName": "chat_id",
+      "fieldType": "String",
+      "label": "chat_id",
+      "helperText": "可使用此机器人的用户id，多用户使用英文逗号隔开",
+      "defaultValue": ""
+    },
+    {
+      "fieldName": "proxy",
+      "fieldType": "String",
+      "label": "代理地址",
+      "helperText": "http或socks代理用于发送连接Telegram，留空不使用",
       "defaultValue": ""
     }
   ],
-  "logoUrl": "/plugins/doubanlist_sub/doubanlogo.png"
+  "logoUrl": "/plugins/tgbot-ptb/logo.jpg"
 }
