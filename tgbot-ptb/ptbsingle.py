@@ -73,6 +73,8 @@ class TgBotSub:
 
     def douban_search(self, media_name: str):
         douban_result_list = server.douban.search(media_name)
+        if len(douban_result_list) >=10:
+            douban_result_list = douban_result_list[:10]
         mr_caption = []
         mr_idlist = []
         mr_poster_path = []
@@ -97,13 +99,13 @@ class TgBotSub:
             else:
                 status = '📥'
             set_num = "%02d" % num
-            caption = f'`{set_num}`.{status}`[{rating}]`|[{cn_name}]({url})\n'
+            caption = f'`{set_num}`.{status}|`{rating}`|[{cn_name}]({url})\n'
             mr_caption.append(caption)
             mr_poster_path.append(poster_path)
             mr_idlist.append(f'{id}-{num}')
             # _LOGGER.info(f'{id}-{num}')
             num += 1
-        mr_caption_final = ''.join(str(i) for i in mr_caption) + '\n\n↓↓↓↓请点对应的序号↓↓↓↓'
+        mr_caption_final = ''.join(str(i) for i in mr_caption) + '\n\n📥未订阅 | ✔已完成' + '\n\n🛎️订阅中 | 🔁洗版中' + '\n\n️️️️请点对应的序号️️️️'
 
         mr_keybord = []
         mr_count = []
@@ -118,7 +120,7 @@ class TgBotSub:
             aaa = InlineKeyboardButton(count1, callback_data=y)
             mr_keybord_final.append(aaa)
             count1 += 1
-        step = 7
+        step = 5
         a = mr_keybord_final
         b = [a[i:i + step] for i in range(0, len(a), step)]
         b.append([InlineKeyboardButton('关闭', callback_data=f'delete-1-')])
@@ -145,9 +147,9 @@ class TgBotSub:
         genres = doubandetils.genres
         episode_count = doubandetils.episode_count  # 集
         if rating == '0.0':
-            rating = f'⭐0.0'
+            rating = f' | ⭐0.0'
         else:
-            rating = f'⭐{rating}'
+            rating = f' | ⭐{rating}'
 
         if len(actor) >= 3:
             actor = doubandetils.actor[0:4]
@@ -182,6 +184,18 @@ class TgBotSub:
             ]
         ]
         self.reply_markup_button = InlineKeyboardMarkup(keyboard)
+
+
+
+        keyboard1 = [
+            [
+                InlineKeyboardButton('返回', callback_data=f'back-{doubanid}-'),
+            ],
+            [
+                InlineKeyboardButton('关闭', callback_data=f'delete-{doubanid}-')
+            ]
+        ]
+        self.reply_markup_doubansub = InlineKeyboardMarkup(keyboard1)
 
     async def menu_list(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         chat_id = str(update.message.chat_id)
@@ -250,7 +264,8 @@ class TgBotSub:
         # _LOGGER.info(f"订阅")
 
         server.subscribe.sub_by_douban(x[1])
-        await query.message.reply_text(f"{self.cn_name} 已提交订阅")
+        await query.edit_message_caption(f"{self.cn_name} 已提交订阅 ✔",reply_markup=self.reply_markup_doubansub)
+        # await query.message.reply_text(f"{self.cn_name} 已提交订阅")
         await query.answer()
 
 
