@@ -10,7 +10,7 @@
       "fieldName": "TGbotTOKEN",
       "fieldType": "String",
       "label": "TGbotTOKEN",
-      "helperText": "从Bot_Father获取TG_Bot的token，输入bot后面的内容，    如： 56273XXXXX:XXXXXXXvsg1OtxmWXIFNqnxEizJU",
+      "helperText": "从Bot_Father获取TG_Bot的token，输入bot后面的内容，如：56273XXXXX:XXXXXXXvsg1OtxmWXIFNqnxEizJU",
       "defaultValue": ""
     },
     {
@@ -24,9 +24,9 @@
       "fieldName": "proxy",
       "fieldType": "String",
       "label": "代理地址",
-      "helperText": "http或socks代理用于发送连接Telegram，留空不使用",
+      "helperText": "http或socks代理用于连接Telegram，留空不使用",
       "defaultValue": ""
     }
   ],
-  "logoUrl": "/plugins/tgbot-ptb/logo.jpg"
+  "logoUrl": "/plugins/tgbot/logo.png"
 }

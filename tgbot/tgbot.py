@@ -68,7 +68,7 @@ class TgBotSub:
 
     def set_config(self, TGbotTOKEN: str, chatid_list: str ,proxy: str ):
         self.TGbotTOKEN = TGbotTOKEN
-        self.chatid_list = chatid_list.split(",") if chatid_list.split(",") else None
+        self.chatid_list = chatid_list.split(",") if chatid_list else None
         self.proxy = proxy if proxy else None
 
     def douban_search(self, media_name: str):
@@ -105,7 +105,7 @@ class TgBotSub:
             mr_idlist.append(f'{id}-{num}')
             # _LOGGER.info(f'{id}-{num}')
             num += 1
-        mr_caption_final = ''.join(str(i) for i in mr_caption) + '\n\n📥未订阅 | ✔已完成' + '\n\n🛎️订阅中 | 🔁洗版中' + '\n\n⬇⬇⬇请点对应的序号⬇⬇⬇'
+        mr_caption_final = ''.join(str(i) for i in mr_caption) + '\n📥未订阅 | ✔已完成' + '\n🛎️订阅中 | 🔁洗版中' + '\n\n⬇⬇⬇请点对应的序号⬇⬇⬇'
 
         mr_keybord = []
         mr_count = []
@@ -163,15 +163,15 @@ class TgBotSub:
         else:
             genres = '流派：#' + ' #'.join(i for i in doubandetils.genres) + '\n'
 
-        if len(intro) >= 100:
-            intro = f'{intro[0:100]}......'
+        if len(intro) >= 200:
+            intro = f'简介：{intro[0:200]}......'
         elif len(intro) == 0:
-            intro = '暂无简介'
+            intro = ''
 
         if media_type == 'MediaType.Movie':
-            self.caption_button = f'片名：*{cn_name}*{rating}\n类型：{media_type.split(".")[1]}\n上映时间：{premiere_date}\n{actor}{genres}简介：{intro}'
+            self.caption_button = f'🎬*{cn_name}*{rating}\n\n上映时间：{premiere_date}\n{actor}{genres}{intro}'
         else:
-            self.caption_button = f'剧名：*{cn_name}*{rating}\n类型：{media_type.split(".")[1]}\n第{season_index}季 共{episode_count}集\n上映时间：{premiere_date}\n{actor}{genres}简介：{intro}'
+            self.caption_button = f'📺*{cn_name}*{rating}\n\n第{season_index}季 共{episode_count}集\n上映时间：{premiere_date}\n{actor}{genres}{intro}'
 
         # _LOGGER.info(f"{self.caption_button} ")
         keyboard = [
@@ -209,8 +209,8 @@ class TgBotSub:
             _LOGGER.info(f"chat_id：{chat_id} , 未经授权")
             return
         else:
-            await update.message.reply_text(f"正在搜索 {update.message.text} 中.....")
-            _LOGGER.info(f"chat_id：{chat_id} , 正在搜索 {update.message.text} 中 ")
+            await update.message.reply_text(f"正在搜索 {update.message.text}")
+            _LOGGER.info(f"chat_id：{chat_id} , 正在搜索 {update.message.text}")
         # _LOGGER.info(f"menu_list")
         self.inputmessage = update.message.text
         result = self.douban_search(update.message.text)
@@ -299,6 +299,8 @@ class TgBotSub:
                 MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Text(['重启Movie-Bot']), self.menu_list))
             # application.add_handler(MessageHandler(filters.Text(['重启Movie-Bot']), rebootmr))
             application.run_polling(stop_signals=None, close_loop=False)
+        except Exception as e:
+            return
         finally:
             loop.close()
             pass
