@@ -15,7 +15,7 @@ def main(plugin: PluginMeta, config: Dict):
     token = config.get('TGbotTOKEN')
     chat_id = config.get('chat_id')
     proxy = config.get('proxy')
-    if not token or not chat_id or not proxy:
+    if not token or not chat_id:
         _LOGGER.info(f'TG Bot缺少配置，停止启动，请完成插件配置')
         return
     tgbot.set_config(token, chat_id, proxy)
