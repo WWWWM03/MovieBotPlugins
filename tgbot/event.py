@@ -12,7 +12,14 @@ tgbot = TgBotSub()
 
 @plugin.after_setup
 def main(plugin: PluginMeta, config: Dict):
-    tgbot.set_config(config.get('TGbotTOKEN'), config.get('chat_id') , config.get('proxy'))
-    _LOGGER.info(f"{plugin.manifest.title}加载成功，TGbotTOKEN:{config.get('TGbotTOKEN')},chat_id:{config.get('chat_id')},Proxy：{config.get('proxy')}")
+    token = config.get('TGbotTOKEN')
+    chat_id = config.get('chat_id')
+    proxy = config.get('proxy')
+    if not token or not chat_id or not proxy:
+        _LOGGER.info(f'TG Bot缺少配置，停止启动，请完成插件配置')
+        return
+    tgbot.set_config(token, chat_id, proxy)
+    _LOGGER.info(
+        f"{plugin.manifest.title}加载成功，TGbotTOKEN:{token},chat_id:{chat_id},Proxy：{proxy}")
     thread = threading.Thread(target=tgbot.start_bot, args=(config,))
     thread.start()
