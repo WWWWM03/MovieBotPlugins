@@ -4,7 +4,7 @@ import threading
 from mbot.core.event.models import EventType
 from mbot.core.plugins import plugin
 from mbot.core.plugins import PluginContext, PluginMeta
-from .ptbsingle import TgBotSub
+from .tgbot import TgBotSub
 
 _LOGGER = logging.getLogger(__name__)
 tgbot = TgBotSub()
