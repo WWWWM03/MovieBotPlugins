@@ -7,6 +7,13 @@
   "requirements": [],
   "configField": [
     {
+      "fieldName": "base_url",
+      "fieldType": "String",
+      "label": "推送api地址",
+      "helperText": "telegram的api服务地址，默认是官方地址:https://api.telegram.org/bot，可以改为自建",
+      "defaultValue": "https://api.telegram.org/bot"
+    },
+    {
       "fieldName": "TGbotTOKEN",
       "fieldType": "String",
       "label": "TGbotTOKEN",

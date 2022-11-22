@@ -22,6 +22,7 @@ from telegram.constants import MessageAttachmentType, ParseMode
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from telegram import ForceReply, Update
 import logging
+import telegram
 
 from telegram import (
     Bot,
@@ -65,13 +66,16 @@ class TgBotSub:
         self.TGbotTOKEN = None
         self.chatid_list = []
         self.proxy = None
+        self.base_url = None
 
-    def set_config(self, TGbotTOKEN: str, chatid_list: str ,proxy: str ):
+    def set_config(self, TGbotTOKEN: str, chatid_list: str, proxy: str, base_url: str ):
         self.TGbotTOKEN = TGbotTOKEN
         self.chatid_list = chatid_list.split(",") if chatid_list else None
         self.proxy = proxy if proxy else None
+        self.base_url = base_url
 
     def douban_search(self, media_name: str):
+
         douban_result_list = server.douban.search(media_name)
         if len(douban_result_list) >=10:
             douban_result_list = douban_result_list[:10]
@@ -203,7 +207,7 @@ class TgBotSub:
         except Exception as e:
             _LOGGER.info(f'不可用于频道，请与TGBot私聊或者在群组内使用')
             return
-            
+
         if self.chatid_list[0] == '':
             await update.message.reply_text(
                 f"当前用户chat_id：{chat_id} ，Movie—Bot插件未设置chat_id，所有用户都可以访问！！")
@@ -292,7 +296,7 @@ class TgBotSub:
         loop = asyncio.new_event_loop()
         try:
             asyncio.set_event_loop(loop)
-            application = Application.builder().token(self.TGbotTOKEN).proxy_url(self.proxy).get_updates_proxy_url(self.proxy).build()
+            application = Application.builder().token(self.TGbotTOKEN).proxy_url(self.proxy).get_updates_proxy_url(self.proxy).base_url(self.base_url).build()
             # application.add_handler(CommandHandler("rebootmr", rebootmr))
             # application.add_handler(CommandHandler("help", help_command))
             application.add_handler(CallbackQueryHandler(self.backtomenu, pattern="^back"))
