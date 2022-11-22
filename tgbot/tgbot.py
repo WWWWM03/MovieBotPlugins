@@ -99,7 +99,7 @@ class TgBotSub:
             else:
                 status = '📥'
             set_num = "%02d" % num
-            caption = f'`{set_num}`.{status}|`{rating}`|[{cn_name}]({url})\n'
+            caption = f'`{set_num}`.`{status}`|`{rating}`|[{cn_name}]({url})\n'
             mr_caption.append(caption)
             mr_poster_path.append(poster_path)
             mr_idlist.append(f'{id}-{num}')
@@ -198,8 +198,12 @@ class TgBotSub:
         self.reply_markup_doubansub = InlineKeyboardMarkup(keyboard1)
 
     async def menu_list(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        chat_id = str(update.message.chat_id)
-        
+        try:
+            chat_id = str(update.message.chat_id)
+        except Exception as e:
+            _LOGGER.info(f'不可用于频道，请与TGBot私聊或者在群组内使用')
+            return
+            
         if self.chatid_list[0] == '':
             await update.message.reply_text(
                 f"当前用户chat_id：{chat_id} ，Movie—Bot插件未设置chat_id，所有用户都可以访问！！")
