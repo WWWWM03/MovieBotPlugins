@@ -16,7 +16,7 @@
     {
       "fieldName": "chat_id",
       "fieldType": "String",
-      "label": "user_id",
+      "label": "UserId",
       "helperText": "可使用此机器人的用户id，多用户使用英文逗号隔开",
       "defaultValue": ""
     },
