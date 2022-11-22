@@ -1,9 +1,9 @@
 {
-  "name": "TG_Bot",
-  "title": "TG_Bot消息交互",
-  "author": "WWWW NaNaKo_ yee",
+  "name": "tgbot",
+  "title": "Telegram机器人",
+  "author": "WWWW NaNaKo",
   "description": "通过TG_Bot交互机器人搜索订阅",
-  "version": "0.1",
+  "version": "0.3",
   "requirements": [],
   "configField": [
     {
@@ -27,6 +27,5 @@
       "helperText": "http或socks代理用于连接Telegram，留空不使用",
       "defaultValue": ""
     }
-  ],
-  "logoUrl": "/plugins/tgbot/logo.png"
+  ]
 }
