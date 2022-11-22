@@ -1,7 +1,7 @@
 {
   "name": "tgbot",
   "title": "Telegram机器人",
-  "author": "WWWW NaNaKo",
+  "author": "WWWW NaNaKo_",
   "description": "通过TG_Bot交互机器人搜索订阅",
   "version": "0.3",
   "requirements": [],
@@ -16,7 +16,7 @@
     {
       "fieldName": "chat_id",
       "fieldType": "String",
-      "label": "chat_id",
+      "label": "user_id",
       "helperText": "可使用此机器人的用户id，多用户使用英文逗号隔开",
       "defaultValue": ""
     },
