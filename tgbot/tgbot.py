@@ -199,8 +199,9 @@ class TgBotSub:
 
     async def menu_list(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         chat_id = str(update.message.chat_id)
-
-        if self.chatid_list[0] == '':
+        if chat_id == '':
+            _LOGGER.info(f'不可用于频道或者群组，请与TGBot私聊使用')
+        elif self.chatid_list[0] == '':
             await update.message.reply_text(
                 f"当前用户chat_id：{chat_id} ，Movie—Bot插件未设置chat_id，所有用户都可以访问！！")
             _LOGGER.info(f"当前用户chat_id：{chat_id} ，Movie—Bot插件未设置chat_id")
