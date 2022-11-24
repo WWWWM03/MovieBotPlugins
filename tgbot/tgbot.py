@@ -15,6 +15,7 @@ from mbot.core.plugins import PluginContext, plugin, PluginCommandContext, Plugi
 from mbot.core.event.models import EventType
 from moviebotapi.subscribe import SubStatus
 from moviebotapi import MovieBotServer
+from moviebotapi.core.models import MediaType
 
 server = mbot_api
 
@@ -97,7 +98,7 @@ class TgBotSub:
             if status == 0:
                 status = '🛎️'
             elif status == 1:
-                status = '✔'
+                status = '✅'
             elif status == 2:
                 status = '🔁'
             else:
@@ -109,7 +110,11 @@ class TgBotSub:
             mr_idlist.append(f'{id}-{num}')
             # _LOGGER.info(f'{id}-{num}')
             num += 1
-        mr_caption_final = ''.join(str(i) for i in mr_caption) + '\n📥未订阅 | ✔已完成' + '\n🛎️订阅中 | 🔁洗版中' + '\n\n⬇⬇⬇请点对应的序号⬇⬇⬇'
+        mr_caption_final = ''.join(str(i) for i in mr_caption) + '\n📥未订阅 | ✅️已完成' + '\n🛎️订阅中 | 🔁洗版中' + '\n\n⬇⬇⬇请点对应的序号⬇⬇⬇'
+
+        meta = self.get_x_details(mr_idlist[0].split('-')[0], 'Movie')
+        douban_img = self.get_douban_img(mr_idlist[0].split('-')[0])
+
 
         mr_keybord = []
         mr_count = []
@@ -132,31 +137,48 @@ class TgBotSub:
         reply_markup1 = InlineKeyboardMarkup(keyboard)
         # _LOGGER.info(f"{media_name} 返回搜索结果：\n{mr_caption_final}")
 
-        return mr_caption_final, mr_poster_path, reply_markup1
+        return mr_caption_final, meta, reply_markup1, douban_img
+
+
+    def get_x_details(self, doubanid: int, type: str):
+
+        if type == 'Movie':
+            return server.meta.get_media_by_douban(MediaType.Movie, doubanid)
+        else:
+            return server.meta.get_media_by_douban(MediaType.Tv, doubanid)
+
+    def get_douban_img(self, doubanid: int):
+        doubandetails = server.douban.get(doubanid)
+        douban_img = doubandetails.cover_image
+        return douban_img
+
+
+
+
 
     def douban_get(self, media_id: str):
-        doubandetils = server.douban.get(media_id)
-        cn_name = doubandetils.cn_name
+        doubandetails = server.douban.get(media_id)
+        cn_name = doubandetails.cn_name
         self.cn_name = cn_name
-        rating = str(doubandetils.rating)
-        intro = doubandetils.intro
-        release_year = doubandetils.release_year
-        doubanid = doubandetils.id
-        self.cover_image = doubandetils.cover_image
-        actor = doubandetils.actor
-        media_type = str(doubandetils.media_type)
-        premiere_date = doubandetils.premiere_date  # 上映时间
-        season_index = doubandetils.season_index  # 季
-        trailer_video_url = str(doubandetils.trailer_video_url)  # 预告片
-        genres = doubandetils.genres
-        episode_count = doubandetils.episode_count  # 集
+        rating = str(doubandetails.rating)
+        intro = doubandetails.intro
+        release_year = doubandetails.release_year
+        doubanid = doubandetails.id
+        self.cover_image = doubandetails.cover_image
+        actor = doubandetails.actor
+        media_type = str(doubandetails.media_type)
+        premiere_date = doubandetails.premiere_date  # 上映时间
+        season_index = doubandetails.season_index  # 季
+        trailer_video_url = str(doubandetails.trailer_video_url)  # 预告片
+        genres = doubandetails.genres
+        episode_count = doubandetails.episode_count  # 集
         if rating == '0.0':
             rating = f' | ⭐0.0'
         else:
             rating = f' | ⭐{rating}'
 
         if len(actor) >= 3:
-            actor = doubandetils.actor[0:4]
+            actor = doubandetails.actor[0:4]
         if not actor:
             actor = ''
         else:
@@ -165,7 +187,7 @@ class TgBotSub:
         if not genres:
             genres = ''
         else:
-            genres = '流派：#' + ' #'.join(i for i in doubandetils.genres) + '\n'
+            genres = '流派：#' + ' #'.join(i for i in doubandetails.genres) + '\n'
 
         if len(intro) >= 200:
             intro = f'简介：{intro[0:200]}......'
@@ -201,6 +223,7 @@ class TgBotSub:
         ]
         self.reply_markup_doubansub = InlineKeyboardMarkup(keyboard1)
 
+
     async def menu_list(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         try:
             chat_id = str(update.message.chat_id)
@@ -226,9 +249,13 @@ class TgBotSub:
             _LOGGER.info(f"{update.message.text} 搜索结果为空")
             await update.message.reply_text(f"{update.message.text} 搜索结果为空")
             return
+        try:
+            result_img = result[1].background_url
+        except Exception as e:
+            result_img = result[3]
         await update.message.reply_photo(
             reply_markup=result[2],
-            photo=result[1][0],
+            photo=result_img,
             caption=result[0],
             parse_mode=ParseMode.MARKDOWN
         )
@@ -257,7 +284,7 @@ class TgBotSub:
         await query.edit_message_media(
             reply_markup=result[2],
             media=InputMediaPhoto(
-                media=result[1][0],
+                media=result[1].background_url,
                 caption=result[0],
                 parse_mode=ParseMode.MARKDOWN
             )
