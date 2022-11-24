@@ -81,7 +81,7 @@ class TgBotSub:
         if len(douban_result_list) >=10:
             douban_result_list = douban_result_list[:10]
         mr_caption = []
-        mr_idlist = []
+        self.mr_idlist = []
         mr_poster_path = []
         num = 1
         for i in douban_result_list:
@@ -107,19 +107,18 @@ class TgBotSub:
             caption = f'`{set_num}`.`{status}`|`{rating}`|[{cn_name}]({url})\n'
             mr_caption.append(caption)
             mr_poster_path.append(poster_path)
-            mr_idlist.append(f'{id}-{num}')
+            self.mr_idlist.append(f'{id}-{num}')
             # _LOGGER.info(f'{id}-{num}')
             num += 1
         mr_caption_final = ''.join(str(i) for i in mr_caption) + '\n📥未订阅 | ✅️已完成' + '\n🛎️订阅中 | 🔁洗版中' + '\n\n⬇⬇⬇请点对应的序号⬇⬇⬇'
 
-        meta = self.get_x_details(mr_idlist[0].split('-')[0], 'Movie')
-        douban_img = self.get_douban_img(mr_idlist[0].split('-')[0])
+        meta = self.get_x_details(self.mr_idlist[0].split('-')[0], 'Movie')
 
 
         mr_keybord = []
         mr_count = []
         y = 1
-        for i in mr_idlist:
+        for i in self.mr_idlist:
             mr_count.append(str(y))
             mr_keybord.append(str(i))
             y += 1
@@ -137,7 +136,7 @@ class TgBotSub:
         reply_markup1 = InlineKeyboardMarkup(keyboard)
         # _LOGGER.info(f"{media_name} 返回搜索结果：\n{mr_caption_final}")
 
-        return mr_caption_final, meta, reply_markup1, douban_img
+        return mr_caption_final, meta, reply_markup1
 
 
     def get_x_details(self, doubanid: int, type: str):
@@ -146,15 +145,6 @@ class TgBotSub:
             return server.meta.get_media_by_douban(MediaType.Movie, doubanid)
         else:
             return server.meta.get_media_by_douban(MediaType.Tv, doubanid)
-
-    def get_douban_img(self, doubanid: int):
-        doubandetails = server.douban.get(doubanid)
-        douban_img = doubandetails.cover_image
-        return douban_img
-
-
-
-
 
     def douban_get(self, media_id: str):
         doubandetails = server.douban.get(media_id)
@@ -202,11 +192,11 @@ class TgBotSub:
         # _LOGGER.info(f"{self.caption_button} ")
         keyboard = [
             [
-                InlineKeyboardButton('🛎️订阅', callback_data=f'sub-{doubanid}-'),
+                InlineKeyboardButton('🔚关闭', callback_data=f'delete-{doubanid}-'),
                 InlineKeyboardButton('🔙返回', callback_data=f'back-{doubanid}-'),
             ],
             [
-                InlineKeyboardButton('🔚关闭', callback_data=f'delete-{doubanid}-')
+                InlineKeyboardButton('🛎️订阅', callback_data=f'sub-{doubanid}-'),
             ]
         ]
         self.reply_markup_button = InlineKeyboardMarkup(keyboard)
@@ -245,6 +235,8 @@ class TgBotSub:
         # _LOGGER.info(f"menu_list")
         self.inputmessage = update.message.text
         result = self.douban_search(update.message.text)
+        self.douban_get(self.mr_idlist[0].split('-')[0])
+
         if result[1] == []:
             _LOGGER.info(f"{update.message.text} 搜索结果为空")
             await update.message.reply_text(f"{update.message.text} 搜索结果为空")
@@ -252,7 +244,7 @@ class TgBotSub:
         try:
             result_img = result[1].background_url
         except Exception as e:
-            result_img = result[3]
+            result_img = self.cover_image
         await update.message.reply_photo(
             reply_markup=result[2],
             photo=result_img,
