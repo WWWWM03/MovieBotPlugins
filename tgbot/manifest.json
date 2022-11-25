@@ -3,7 +3,7 @@
   "title": "Telegram机器人",
   "author": "WWWW NaNaKo_",
   "description": "通过TG_Bot交互机器人搜索订阅",
-  "version": "0.3",
+  "version": "0.4",
   "requirements": [],
   "configField": [
     {
