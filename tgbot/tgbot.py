@@ -141,10 +141,11 @@ class TgBotSub:
 
     def get_x_details(self, doubanid: int, type: str):
 
-        if type == 'Movie':
-            return server.meta.get_media_by_douban(MediaType.Movie, doubanid)
-        else:
-            return server.meta.get_media_by_douban(MediaType.Tv, doubanid)
+        try:
+            meta = server.meta.get_media_by_douban(MediaType.Movie, doubanid)
+        except Exception as e:
+            meta = server.meta.get_media_by_douban(MediaType.Tv, doubanid)
+        return meta
 
     def douban_get(self, media_id: str):
         doubandetails = server.douban.get(media_id)
