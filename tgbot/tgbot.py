@@ -141,11 +141,16 @@ class TgBotSub:
 
     def get_x_details(self, doubanid: int, type: str):
 
-        try:
-            meta = server.meta.get_media_by_douban(MediaType.Movie, doubanid)
-        except Exception as e:
-            meta = server.meta.get_media_by_douban(MediaType.Tv, doubanid)
-        return meta
+        # try:
+        #     meta = server.meta.get_media_by_douban(MediaType.Movie, doubanid)
+        # except Exception as e:
+        #     meta = server.meta.get_media_by_douban(MediaType.Tv, doubanid)
+        # return meta
+        if type == 'Movie':
+            return server.meta.get_media_by_douban(MediaType.Movie, doubanid)
+        else:
+            return server.meta.get_media_by_douban(MediaType.Tv, doubanid)
+
 
     def douban_get(self, media_id: str):
         doubandetails = server.douban.get(media_id)
@@ -242,8 +247,12 @@ class TgBotSub:
             _LOGGER.info(f"{update.message.text} 搜索结果为空")
             await update.message.reply_text(f"{update.message.text} 搜索结果为空")
             return
+        result_img = None
         try:
-            result_img = result[1].background_url
+            if result[1].background_url != None:
+                result_img = result[1].background_url
+            else:
+                result_img = self.cover_image
         except Exception as e:
             result_img = self.cover_image
         await update.message.reply_photo(
