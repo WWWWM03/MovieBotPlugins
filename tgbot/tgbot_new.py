@@ -81,7 +81,7 @@ _LOGGER = logging.getLogger(__name__)
 class TgBotSub:
 
     def __init__(self):
-        self.TGbotTOKEN = 'kxrijBGeiM'
+        self.TGbotTOKEN = 'jBGeiM'
         # self.chatid_list = ''.split(",")
         self.chatid_list = ['']
         self.proxy = None
