@@ -6,8 +6,8 @@
 from moviebotapi import MovieBotServer
 from moviebotapi.core.session import AccessKeySession
 from moviebotapi.subscribe import SubStatus
-SERVER_URL = 'http://192.168.50.190:1329'
-ACCESS_KEY = '123524'
+SERVER_URL = ''
+ACCESS_KEY = ''
 server = MovieBotServer(AccessKeySession(SERVER_URL, ACCESS_KEY))
 DEVELOPER_CHAT_ID = 5414216757
 
@@ -81,7 +81,7 @@ _LOGGER = logging.getLogger(__name__)
 class TgBotSub:
 
     def __init__(self):
-        self.TGbotTOKEN = '5697802472:AAHRPTOrLPyru2RFDvmWNqrPckxrijBGeiM'
+        self.TGbotTOKEN = ''
         # self.chatid_list = ''.split(",")
         self.chatid_list = ['']
         self.proxy = None
