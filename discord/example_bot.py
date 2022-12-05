@@ -16,7 +16,7 @@ def _update():
     if sessions == []:
         app.update(state="摸鱼ing....", large_image="plex")
         return
-    elif sessions[0].TAG == 'Movie':
+    elif sessions[0].TYPE == 'movie':
         sessions = sessions[0]
         title = sessions.title
     else:
