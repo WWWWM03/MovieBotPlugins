@@ -20,6 +20,7 @@ SERVER_URL = 'http://192.168.50.190:1329'
 ACCESS_KEY = '123524'
 server = MovieBotServer(AccessKeySession(SERVER_URL, ACCESS_KEY))
 
+
 def download_img(func):
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
@@ -70,7 +71,7 @@ class AnnualReport:
                     episode += 1
             else:
                 pass
-        return mbot_subscribe ,movie ,episode
+        return mbot_subscribe, movie, episode
 
     def get_plex_iswatched(self):
         '获取plex上已观看的电影和电视剧的海报，返回thumbUrl'
@@ -96,7 +97,7 @@ class AnnualReport:
                     pass
             else:
                 pass
-        return thumburl ,moviecount ,episodecount
+        return thumburl, moviecount, episodecount
 
     def download_img(self, thumburl):
         '下载图像'
@@ -281,7 +282,6 @@ class AnnualReport:
         else:
             draw.text((745, 920), f'999', font=bold_font, fill=(245, 214, 174), align='center')
 
-
         # 年度
         draw.text((490, 795), f'2022', font=regular_font, fill=(209, 183, 149))
         # # 昵称
@@ -297,7 +297,8 @@ class AnnualReport:
         # self.report_image(data)  # 生成海报墙
         self.final_report(data, moviecount, episodcount)  # 包装海报，生成最终海报墙
 
-image_list ,moviecount ,episodecount= AnnualReport().mbot_subscribe()
+
+image_list, moviecount, episodecount = AnnualReport().mbot_subscribe()
 AnnualReport().run_report(data=image_list, moviecount=moviecount, episodcount=episodecount)
 '''
     data: 带有海报图片完整路径的列表
